@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - E-commerce Nerd (Demo)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary-color: #ec4899;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-bg: #1f2937;
+            --darker-bg: #111827;
+            --light-bg: #f9fafb;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-light: #ffffff;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
+            color: var(--text-light);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 4px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 90;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: var(--light-bg);
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .header-btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--danger-color);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-color);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 240px;
+            background: var(--light-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            position: relative;
+        }
+
+        .badge-featured {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--warning-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-category {
+            color: var(--primary-color);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 12px 0;
+        }
+
+        .product-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Demo Notice */
+        .demo-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .demo-notice strong {
+            font-size: 18px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">🛍️</span>
+            <span class="logo-text">Nerd Admin</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item active" onclick="showPage('dashboard')">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="showPage('categories')">
+                <span class="nav-icon">📁</span>
+                <span>Categorias</span>
+            </div>
+            <div class="nav-item" onclick="showPage('products')">
+                <span class="nav-icon">👕</span>
+                <span>Produtos</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Header -->
+    <header class="header">
+        <h1 class="page-title">Painel Administrativo</h1>
+        <div class="header-actions">
+            <button class="header-btn" title="Notificações">
+                <span class="notification-badge">3</span>
+                🔔
+            </button>
+            <button class="header-btn" title="Configurações">
+                ⚙️
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="demo-notice">
+            <strong>🎨 DEMO VISUAL</strong><br>
+            Esta é uma demonstração visual do painel. Para funcionar completamente, instale o Node.js e execute <code>npm install && npm start</code>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page-content">
+            <div class="page-header">
+                <div>
+                    <h2 style="font-size: 32px; margin-bottom: 8px;">Bem-vindo ao Painel! 🎉</h2>
+                    <p class="page-subtitle">Gerencie suas categorias e produtos facilmente</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        📁
+                    </div>
+                    <div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Categorias</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        👕
+                    </div>
+                    <div>
+                        <div class="stat-value">48</div>
+                        <div class="stat-label">Produtos</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        📦
+                    </div>
+                    <div>
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">Pedidos</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        💰
+                    </div>
+                    <div>
+                        <div class="stat-value">R$ 12.5k</div>
+                        <div class="stat-label">Faturamento</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Page -->
+        <div id="products-page" class="page-content hidden">
+            <div class="page-header">
+                <div>
+                    <h2 style="font-size: 32px; margin-bottom: 8px;">👕 Produtos</h2>
+                    <p class="page-subtitle">Gerencie o catálogo de produtos da sua loja</p>
+                </div>
+                <button class="btn btn-primary">➕ Novo Produto</button>
+            </div>
+
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <span class="badge-featured">⭐ Destaque</span>
+                        👕
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Camisetas</div>
+                        <div class="product-name">Camiseta Dragon Ball</div>
+                        <div class="product-price">R$ 89,90</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                            Estoque: 50 | SKU: CMST-DBZ-001
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-outline">✏️ Editar</button>
+                            <button class="btn btn-danger">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-image">
+                        🧥
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Moletons</div>
+                        <div class="product-name">Moletom Harry Potter</div>
+                        <div class="product-price">R$ 149,90</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                            Estoque: 30 | SKU: MLT-HP-001
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-outline">✏️ Editar</button>
+                            <button class="btn btn-danger">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-image">
+                        <span class="badge-featured">⭐ Destaque</span>
+                        ☕
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Canecas</div>
+                        <div class="product-name">Caneca Star Wars</div>
+                        <div class="product-price">R$ 39,90</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                            Estoque: 100 | SKU: CNC-SW-001
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-outline">✏️ Editar</button>
+                            <button class="btn btn-danger">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Page -->
+        <div id="categories-page" class="page-content hidden">
+            <div class="page-header">
+                <div>
+                    <h2 style="font-size: 32px; margin-bottom: 8px;">📁 Categorias</h2>
+                    <p class="page-subtitle">Gerencie as categorias dos seus produtos</p>
+                </div>
+                <button class="btn btn-primary">➕ Nova Categoria</button>
+            </div>
+
+            <div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: var(--light-bg);">
+                        <tr>
+                            <th style="padding: 16px; text-align: left;">Nome</th>
+                            <th style="padding: 16px; text-align: left;">Descrição</th>
+                            <th style="padding: 16px; text-align: left;">Status</th>
+                            <th style="padding: 16px; text-align: left;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-top: 1px solid var(--border-color);">
+                            <td style="padding: 16px;"><strong>Camisetas</strong></td>
+                            <td style="padding: 16px;">Camisetas diversas</td>
+                            <td style="padding: 16px;">
+                                <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                    Ativo
+                                </span>
+                            </td>
+                            <td style="padding: 16px;">
+                                <button class="btn btn-outline" style="padding: 8px 16px; margin-right: 8px;">✏️</button>
+                                <button class="btn btn-danger" style="padding: 8px 16px;">🗑️</button>
+                            </td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--border-color);">
+                            <td style="padding: 16px;"><strong>Moletons</strong></td>
+                            <td style="padding: 16px;">Moletons e hoodies</td>
+                            <td style="padding: 16px;">
+                                <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                    Ativo
+                                </span>
+                            </td>
+                            <td style="padding: 16px;">
+                                <button class="btn btn-outline" style="padding: 8px 16px; margin-right: 8px;">✏️</button>
+                                <button class="btn btn-danger" style="padding: 8px 16px;">🗑️</button>
+                            </td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--border-color);">
+                            <td style="padding: 16px;"><strong>Canecas</strong></td>
+                            <td style="padding: 16px;">Canecas personalizadas</td>
+                            <td style="padding: 16px;">
+                                <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                    Ativo
+                                </span>
+                            </td>
+                            <td style="padding: 16px;">
+                                <button class="btn btn-outline" style="padding: 8px 16px; margin-right: 8px;">✏️</button>
+                                <button class="btn btn-danger" style="padding: 8px 16px;">🗑️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function showPage(page) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            
+            // Remove active from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(page + '-page').classList.remove('hidden');
+            
+            // Add active to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+        }
+    </script>
+</body>
+</html>
