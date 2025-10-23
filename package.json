@@ -1,0 +1,9 @@
+{
+  "name": "geek-dungeon-app",
+  "version": "1.0.0",
+  "description": "E-commerce Geek Dungeon - Sistema Completo",
+  "private": true,
+  "workspaces": [
+    "admin-frontend"
+  ]
+}
